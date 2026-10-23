@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Nodeplay
+GenericName=Music Player Remote
+Comment=Control Bluesound / NAD / BluOS players on your network
+Exec=nodeplay
+Icon=io.github.basdekisaggelos.Nodeplay
+Terminal=false
+Categories=AudioVideo;Audio;Player;GTK;
+Keywords=bluesound;bluos;node;nad;streamer;tidal;tunein;
+StartupWMClass=io.github.basdekisaggelos.Nodeplay

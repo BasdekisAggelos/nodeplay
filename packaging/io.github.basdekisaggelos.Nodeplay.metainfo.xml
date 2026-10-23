@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.basdekisaggelos.Nodeplay</id>
+  <name>Nodeplay</name>
+  <summary>Control your Bluesound and other BluOS players</summary>
+  <developer id="io.github.aggelos">
+    <name>Aggelos Basdekis</name>
+  </developer>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <launchable type="desktop-id">io.github.basdekisaggelos.Nodeplay.desktop</launchable>
+  <icon type="stock">io.github.basdekisaggelos.Nodeplay</icon>
+  <description>
+    <p>
+      A fast, native Linux app for BluOS music streamers — Bluesound NODE, POWERNODE, PULSE,
+      NAD and others — on your home network. Unofficial; not affiliated with Lenbrook.
+    </p>
+    <p>
+      The app talks directly to your player over your home network, using the BluOS API that
+      Lenbrook (the maker of Bluesound and BluOS) publishes for integrations — the same local
+      interface the official apps use. No cloud service, no account, nothing extra installed on the player.
+    </p>
+    <ul>
+      <li>Now playing, volume, queue, favourites and recently played</li>
+      <li>Browse and search TIDAL, TuneIn, Radio Paradise and your own music library</li>
+      <li>Share a music folder from this PC to the player in one click</li>
+      <li>Alarms, sleep timer and player settings</li>
+      <li>Bluetooth: play from your phone, or listen on Bluetooth headphones</li>
+    </ul>
+    <p>
+      Tested on a Bluesound NODE. Using another BluOS device? Tell us what works and what you need.
+    </p>
+  </description>
+  <categories>
+    <category>AudioVideo</category>
+    <category>Audio</category>
+    <category>Player</category>
+  </categories>
+  <keywords>
+    <keyword>bluesound</keyword>
+    <keyword>bluos</keyword>
+    <keyword>node</keyword>
+    <keyword>nad</keyword>
+    <keyword>streamer</keyword>
+    <keyword>tidal</keyword>
+    <keyword>tunein</keyword>
+  </keywords>
+  <url type="homepage">https://github.com/BasdekisAggelos/nodeplay</url>
+  <url type="bugtracker">https://github.com/BasdekisAggelos/nodeplay/issues</url>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="@VERSION@" date="@DATE@">
+      <description>
+        <ul>
+          <li>Alarms: wake up to a favourite, an input or the current queue</li>
+          <li>New Bluetooth page: play from your phone or connect headphones</li>
+          <li>Rescan music library button</li>
+          <li>Service "Favourites" buttons open your favourites</li>
+          <li>Notices when the player is offline or has a firmware update</li>
+          <li>Package maintainer address is now the GitHub no-reply address</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>

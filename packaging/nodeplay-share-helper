@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Privileged helper (run via pkexec) — share a folder read-only over SMB for BluOS players.
+# Usage: nodeplay-share-helper add <absolute-dir> <ShareName> <owner-user>
+set -euo pipefail
+[ "$(id -u)" -eq 0 ] || { echo "must run as root" >&2; exit 1; }
+[ "${1:-}" = "add" ] || { echo "usage: $0 add DIR NAME USER" >&2; exit 2; }
+DIR=$2 NAME=$3 OWNER=$4
+[[ "$DIR" = /* && -d "$DIR" ]] || { echo "not a folder: $DIR" >&2; exit 3; }
+[[ "$NAME" =~ ^[A-Za-z0-9_-]{1,40}$ ]] || { echo "bad share name: $NAME" >&2; exit 3; }
+id "$OWNER" >/dev/null 2>&1 || { echo "no such user: $OWNER" >&2; exit 3; }
+[[ "$DIR" != *$'\n'* ]] || exit 3
+
+if ! command -v smbd >/dev/null; then
+    apt-get update -qq
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq samba >/dev/null
+fi
+
+CONF=/etc/samba/smb.conf
+[ -f "$CONF.orig-before-bluos" ] || cp "$CONF" "$CONF.orig-before-bluos"
+grep -q "map to guest" "$CONF" || sed -i 's/^\[global\]/[global]\n   map to guest = bad user/' "$CONF"
+# replace an earlier block with the same name (only ones we wrote)
+python3 - "$CONF" "$NAME" <<'PY'
+import re, sys
+conf, name = sys.argv[1], sys.argv[2]
+txt = open(conf).read()
+txt = re.sub(r"\n\[%s\]\n   comment = Music for BluOS\n(?:   .*\n)*" % re.escape(name), "\n", txt)
+open(conf, "w").write(txt)
+PY
+if grep -q "^\[$NAME\]" "$CONF"; then echo "a share named [$NAME] already exists in $CONF" >&2; exit 4; fi
+cat >> "$CONF" <<CFG
+
+[$NAME]
+   comment = Music for BluOS
+   path = $DIR
+   browseable = yes
+   read only = yes
+   guest ok = yes
+   force user = $OWNER
+CFG
+testparm -s >/dev/null 2>&1 || { cp "$CONF.orig-before-bluos" "$CONF"; echo "samba config invalid, restored" >&2; exit 5; }
+systemctl enable smbd >/dev/null 2>&1 || true
+systemctl restart smbd
+if command -v ufw >/dev/null && ufw status | grep -q "Status: active"; then ufw allow samba >/dev/null; fi
+echo OK

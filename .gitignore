@@ -1,0 +1,7 @@
+__pycache__/
+dist/
+*.zip
+*.exe
+BluOS_Integration_Utility_v1.8.1/
+*.pdf
+*.png

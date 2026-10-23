@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <action id="io.github.basdekisaggelos.Nodeplay.share">
+    <description>Share a music folder with BluOS players</description>
+    <message>Authentication is required to share a music folder on your network</message>
+    <icon_name>io.github.basdekisaggelos.Nodeplay</icon_name>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/lib/nodeplay/nodeplay-share-helper</annotate>
+  </action>
+</policyconfig>
