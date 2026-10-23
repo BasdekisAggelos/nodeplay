@@ -1,0 +1,27 @@
+id: io.github.basdekisaggelos.Nodeplay
+runtime: org.gnome.Platform
+runtime-version: '51'
+sdk: org.gnome.Sdk
+command: nodeplay
+finish-args:
+  - --share=network   # talks to the player over HTTP (port 11000) and LSDP discovery (UDP 11430)
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+
+modules:
+  - name: nodeplay
+    buildsystem: simple
+    build-commands:
+      - install -d /app/lib/nodeplay/nodeplay
+      - install -m644 nodeplay/*.py /app/lib/nodeplay/nodeplay/
+      - printf '#!/bin/sh\nexport PYTHONPATH=/app/lib/nodeplay\nexec python3 -m nodeplay "$@"\n' > nodeplay.sh
+      - install -Dm755 nodeplay.sh /app/bin/nodeplay
+      - install -Dm644 packaging/${FLATPAK_ID}.desktop /app/share/applications/${FLATPAK_ID}.desktop
+      - install -Dm644 packaging/${FLATPAK_ID}.svg /app/share/icons/hicolor/scalable/apps/${FLATPAK_ID}.svg
+      - install -Dm644 packaging/${FLATPAK_ID}.metainfo.xml /app/share/metainfo/${FLATPAK_ID}.metainfo.xml
+    sources:
+      - type: git
+        url: https://github.com/BasdekisAggelos/nodeplay.git
+        tag: v2.1.0

@@ -55,16 +55,39 @@
     <display_length compare="ge">360</display_length>
   </requires>
   <content_rating type="oars-1.1"/>
+  <branding>
+    <color type="primary" scheme_preference="light">#a6e6f0</color>
+    <color type="primary" scheme_preference="dark">#14181b</color>
+  </branding>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Home: favourites, most used and recently played</caption>
+      <image>https://raw.githubusercontent.com/BasdekisAggelos/nodeplay/v2.1.0/screenshots/home.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Now playing</caption>
+      <image>https://raw.githubusercontent.com/BasdekisAggelos/nodeplay/v2.1.0/screenshots/now-playing.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Player settings, alarms and Bluetooth</caption>
+      <image>https://raw.githubusercontent.com/BasdekisAggelos/nodeplay/v2.1.0/screenshots/settings.png</image>
+    </screenshot>
+  </screenshots>
   <releases>
-    <release version="@VERSION@" date="@DATE@">
+    <release version="2.1.0" date="2026-10-23">
       <description>
+        <p>Available on Flathub. In the Flatpak version, sharing a folder from this PC is done in your file manager; the app shows how.</p>
+      </description>
+    </release>
+    <release version="2.0.1" date="2026-10-23">
+      <description>
+        <p>First public release as Nodeplay.</p>
         <ul>
           <li>Alarms: wake up to a favourite, an input or the current queue</li>
-          <li>New Bluetooth page: play from your phone or connect headphones</li>
+          <li>Bluetooth page: play from your phone or connect headphones</li>
           <li>Rescan music library button</li>
           <li>Service "Favourites" buttons open your favourites</li>
           <li>Notices when the player is offline or has a firmware update</li>
-          <li>Package maintainer address is now the GitHub no-reply address</li>
         </ul>
       </description>
     </release>

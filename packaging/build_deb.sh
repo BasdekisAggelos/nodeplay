@@ -16,8 +16,7 @@ install -m644 packaging/io.github.basdekisaggelos.Nodeplay.desktop "$ROOT/usr/sh
 install -m644 packaging/io.github.basdekisaggelos.Nodeplay.svg "$ROOT/usr/share/icons/hicolor/scalable/apps/"
 install -m755 packaging/nodeplay-share-helper "$ROOT/usr/lib/$PKG/nodeplay-share-helper"
 install -d "$ROOT/usr/share/metainfo"
-sed -e "s/@VERSION@/$VERSION/" -e "s/@DATE@/$(date +%F)/" packaging/io.github.basdekisaggelos.Nodeplay.metainfo.xml \
-    > "$ROOT/usr/share/metainfo/io.github.basdekisaggelos.Nodeplay.metainfo.xml"
+install -m644 packaging/io.github.basdekisaggelos.Nodeplay.metainfo.xml "$ROOT/usr/share/metainfo/io.github.basdekisaggelos.Nodeplay.metainfo.xml"
 chmod 644 "$ROOT/usr/share/metainfo/io.github.basdekisaggelos.Nodeplay.metainfo.xml"
 install -d "$ROOT/usr/share/polkit-1/actions"
 install -m644 packaging/io.github.basdekisaggelos.Nodeplay.policy "$ROOT/usr/share/polkit-1/actions/"

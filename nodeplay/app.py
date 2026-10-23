@@ -22,6 +22,7 @@ APP_ID = "io.github.basdekisaggelos.Nodeplay"  # must match .desktop + icon name
 CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
 CONFIG_PATH = CONFIG_DIR / "nodeplay" / "config.json"
 OLD_CONFIG_PATH = CONFIG_DIR / "bluos-controller" / "config.json"  # before the rename to Nodeplay
+IN_FLATPAK = Path("/.flatpak-info").exists()
 FEEDBACK_URL = "https://github.com/BasdekisAggelos/nodeplay/issues"
 
 
@@ -189,7 +190,8 @@ window, .view, scrolledwindow > viewport { background: #1e2223; }
 .sidebar-pane row:selected { background: alpha(#fff, 0.10); color: #fff; border-left-color: @accent_bg_color; }
 .sidebar-pane row:hover { background: alpha(#fff, 0.06); }
 .sidebar-pane row label { font-size: 13pt; }
-.brand { font-size: 21pt; font-weight: 200; letter-spacing: 7px; margin: 20px 0 12px 0; }
+.brand { font-size: 21pt; font-weight: 200; letter-spacing: 7px; margin: 20px 0 0 0; }
+.brand-sub { font-size: 9pt; letter-spacing: 2px; opacity: 0.55; margin: 2px 0 12px 0; }
 .page-title { font-size: 26pt; font-weight: 400; letter-spacing: 1px; }
 .shelf { padding: 4px 0; }
 .shelf.solid { background: #26292b; border-radius: 12px; padding: 16px; }
@@ -1083,10 +1085,10 @@ class SettingsPage(Gtk.Box):
         self.box.append(group)
 
         if info:
-            extra = Adw.PreferencesGroup(title="Alarms and Bluetooth")
+            extra = Adw.PreferencesGroup(title="More")
             for title, sub, icon, pid, show in (
                     ("Alarms", "Wake up to a favorite, an input or whatever was playing",
-                     "alarm-symbolic", "__alarms__", True),
+                     "alarm-symbolic", "__alarms__", not any(e.get("class") == "alarms" for e in node.iter())),
                     ("Bluetooth", "Play from your phone, or listen on Bluetooth headphones",
                      "bluetooth-symbolic", "__bt__", True)):
                 if not show:
@@ -1179,15 +1181,23 @@ class SettingsPage(Gtk.Box):
         btn.connect("clicked", do_add)
         add.add(btn)
 
-        local = Adw.PreferencesGroup(
-            title="Share a folder from this PC",
-            description="Pick your music folder. The app shares it read-only on your network "
-                        "(installs Samba if needed — asks for your password once) and adds it to the player.")
-        pick = Gtk.Button(label="Choose music folder…", halign=Gtk.Align.START)
-        pick.add_css_class("suggested-action")
-        pick.add_css_class("pill")
-        pick.connect("clicked", lambda _b: self._pick_local_folder(pick))
-        local.add(pick)
+        if IN_FLATPAK:  # the sandbox can't install or configure Samba: explain how instead
+            ip = local_ip_for(self.win.player.ip)
+            local = Adw.PreferencesGroup(
+                title="Share a folder from this PC",
+                description="1. In your file manager, right-click your music folder → Properties → "
+                            "Local Network Share (or install Samba and share it read-only).\n"
+                            f"2. Enter it below as \\\\{ip}\\<share name>, e.g. \\\\{ip}\\Music.")
+        else:
+            local = Adw.PreferencesGroup(
+                title="Share a folder from this PC",
+                description="Pick your music folder. The app shares it read-only on your network "
+                            "(installs Samba if needed — asks for your password once) and adds it to the player.")
+            pick = Gtk.Button(label="Choose music folder…", halign=Gtk.Align.START)
+            pick.add_css_class("suggested-action")
+            pick.add_css_class("pill")
+            pick.connect("clicked", lambda _b: self._pick_local_folder(pick))
+            local.add(pick)
         self.box.append(local)
         self.box.append(add)
 
@@ -1669,7 +1679,10 @@ class SettingsPage(Gtk.Box):
                                                           lambda _m: self.reload(keep_scroll=True), self.win.error))
             row.add_suffix(step_btn)
         elif cls == "alarms":
-            row = Adw.ActionRow(title=title, subtitle=f"{el.get('count', 0)} set — manage alarms in the BluOS phone app")
+            n = int(el.get("count") or 0)
+            row = Adw.ActionRow(title=title, subtitle=f"{n} set" if n else "None set — add one", activatable=True)
+            row.add_suffix(Gtk.Image.new_from_icon_name("go-next-symbolic"))
+            row.connect("activated", lambda _r: self.open_special("Alarms", "__alarms__"))
         else:
             return None
         self._icon(row, el)
@@ -2315,8 +2328,11 @@ class MainWindow(Adw.ApplicationWindow):
         # ---- sidebar
         side = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         side.add_css_class("sidebar-pane")
-        self.brand = Gtk.Label(label="BLUOS")
-        self.brand.add_css_class("brand")
+        title = Gtk.Label(label="NODEPLAY")
+        title.add_css_class("brand")
+        side.append(title)
+        self.brand = Gtk.Label(label="for BluOS players")  # becomes "for <player's brand>" once it answers
+        self.brand.add_css_class("brand-sub")
         side.append(self.brand)
         self.search = Gtk.SearchEntry(placeholder_text="Search", margin_start=10, margin_end=10)
         self.search.connect("activate", self._on_search)
@@ -2564,7 +2580,7 @@ class MainWindow(Adw.ApplicationWindow):
         p = self.player
         run_bg(lambda: p.browse(), lambda r: self._build_nav(r["sections"][0][1] if r["sections"] else []),
                self.error)
-        run_bg(p.sync_status, lambda i: self.brand.set_label((i.get("brand") or "BluOS").upper()), lambda e: None)
+        run_bg(p.sync_status, lambda i: self.brand.set_label(f"for {i.get('brand') or 'BluOS players'}"), lambda e: None)
         self.offline_banner.set_revealed(False)
         self.update_banner.set_revealed(False)
         run_bg(p.update_available, lambda up: self.update_banner.set_revealed(up and self.player is p),
